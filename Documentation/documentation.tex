@@ -1,0 +1,41 @@
+\documentclass[]{report}
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+
+
+% Title Page
+\title{ Rozpoznawanie i klasyfikacja pisanych cyfr przy użyciu modeli matematycznych  }
+\author{Anna Zawadzka \\ Piotr Waszkiewicz}
+
+
+\begin{document}
+\maketitle
+
+\chapter{Projekt}
+
+
+\section{Opis}
+
+Celem zadania jest porównanie jakości klasyfikacji dla różnych modeli matematycznych, oraz próba minimalizacji ich błędów poprzez ekstrakcję dodatkowych cech obiektów z bazy danych. Podczas realizacji projektu wykorzystane zostaną jedne z najpopularniejszych obecnie klasyfikatorów: maszyny wektorów podpierających (SVM), Lasy Losowe, kNN, model regresji wielomianowej oraz sieci neuronowe. Zbiory danych treningowych oraz testowych zostaną zaczerpnięte z publicznej bazy danych MNIST\cite{mnist_database}. \\
+
+
+\section{Cel badań}
+
+Celem badania jest wskazanie najskuteczniejszego klasyfikatora pod względem czasu uczenia, wydajności i jakości udzielanych odpowiedzi. Oprócz tego badania mają na celu rozszerzenie istniejącego wektora cech o nowe, unikalne wartości które polepszą jakość klasyfikacji. Przykładem takich cech może być liczba przecięć w napisanym symbolu, liczba zakończeń lub procent powierzchni zajmowanej przez narysowany symbol. W trakcie obliczeń podjęta zostanie próba odrzucenia tych cech które przeszkadzają lub pogarszają działanie modeli. Przeprowadzone badania obejmą również wybór optymalnych parametrów dla poszczególnych klasyfikatorów metodą GridSearch\cite{gridsearch}. \\
+
+
+\section{Zbiory danych}
+
+Zbiory danych treningowych oraz testowych pochodzą z publicznej bazy danych MNIST\cite{mnist_database}. Każdy element ze zbioru treningowego jest opisany 785 wartościami. Pierwsza liczba określa zakodowaną cyfrę (wartość z przedziału [0, 9]), kolejne 784 wartości są z przedziału [0, 255] i opisują kolory pikseli zeskanowanej cyfry w skali szarości dla obrazka o wymiarach 28x28 pikseli. Zbiór testowy w przeciwieństwie do treningowego nie zawiera informacji o reprezentowanej klasie. Zbiór treningowy i testowy zawierają odpowiednio 60,000 i 10,000 elementów. \\
+
+
+\section{Sposób weryfikacji rozwiązań}
+
+Podczas ewaluacji otrzymywanych rozwiązań minimalizowana będzie funkcja błędu opisana wzorem \[ f(M, d) = e(M, d) + t(M, d) \] gdzie \textit{M} oznacza model, \textit{d} zbiór testowy, \textit{e()} współczynnik \textit{Error rate}, czyli miarę określającą stosunek źle zaklasyfikowanych elementów do wszystkich obiektów w zbiorze, oraz \textit{t()} funkcję czasu liczoną jako liczbę sekund potrzebną na realizację obliczeń.
+
+\begin{thebibliography}{9}
+	\bibitem{mnist_database} http://yann.lecun.com/exdb/mnist/index.html
+	\bibitem{gridsearch} http://scikit-learn.org/stable/modules/grid\_search.html
+\end{thebibliography}
+
+\end{document}          

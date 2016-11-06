@@ -1,5 +1,7 @@
 import numpy
-from skimage.morphology import skeletonize
+from skimage.morphology import erosion, dilation, opening, closing, white_tophat
+from skimage.morphology import black_tophat, skeletonize, convex_hull_image
+from skimage.morphology import disk
 from PIL import Image as PImage
 
 default_image_size = (28, 28)
@@ -24,7 +26,21 @@ class Image:
         # k3m.skeletize(img).show()
         img.show()
 
+    def dilate(self, mask_size):
+        mask = disk(mask_size)
+        img = dilation(self.image_array, mask)
+        return numpy.uint8(img)
+
+    def erode(self, mask_size):
+        mask = disk(mask_size)
+        img = erosion(self.image_array, mask)
+        return numpy.uint8(img)
+
     def skeletonize(self):
+        """
+        Converts shape in image to 1px wide one. Returns array of 8bit ints containing pixel color values.
+        :return: skeletonized image
+        """
         img = numpy.asarray(map(lambda x: x / 255, self.image_array))
         img = skeletonize(img)
         img = numpy.asarray(map(lambda x: x * 255, img))
