@@ -34,7 +34,7 @@ Problem badawczy przedstawiony na stronie \textit{https://www.kaggle.com/c/digit
 \end{center}
 
 \section{Planowane do wykorzystania techniki}
-Projekt zakłada realizację zadania poprzez zbadanie różnych metod, ze szczególnym uwzględnieniem różnych modeli sieci neuronowych. Wykorzystane zostaną również jedne z najpopularniejszych obecnie klasyfikatorów: maszyny wektorów podpierających (SVM), Lasy Losowe, kNN oraz model regresji wielomianowej. \\
+Projekt zakłada realizację zadania poprzez zbadanie różnych metod, ze szczególnym uwzględnieniem różnych modeli sieci neuronowych. Na chwilę obecną planowana jest konstrukcja sieci klasyfikującej typu \textit{feed-forward} zgodnie z opisem na stronie biblioteki PyBrain\cite{pybrain}. Wykorzystane zostaną również jedne z najpopularniejszych obecnie klasyfikatorów: maszyny wektorów podpierających (SVM)\cite{CortesVapnik1995}, Lasy Losowe\cite{RF}, kNN\cite{Altman1992} oraz model regresji wielomianowej. \\
 
 \section{Cel badań}
 
@@ -53,12 +53,13 @@ Podczas ewaluacji otrzymywanych rozwiązań minimalizowana będzie funkcja błę
 \newpage
 \begin{thebibliography}{9}
 	\bibitem{mnist_database} LeCun, Y., Cortes, C., and Burges, C., \emph{The MNIST database of handwritten digits}, in: http://yann.lecun.com/exdb/mnist.
-	\bibitem{gridsearch} http://scikit-learn.org/stable/modules/grid\_search.html.
 	\bibitem{RF} Breiman, L., \emph{Random Forests}. Machine Learning 45 (1), 2001
 	\bibitem{CortesVapnik1995} Cortes, C., Vapnik, V., \emph{Support-vector networks}. Machine Learning 20 (3), 1995.	
 	\bibitem{Altman1992} Altman N. S., \emph{An introduction to kernel and nearest-neighbor nonparametric regression}. The American Statistician 46 (3), 1992.
     \bibitem{ScholkopfWilliamsonSmola1992} Scholkopf, B., Williamson, R., Smola, A., Shawe-Taylort, J., Platt, J., \emph{Support Vector Method for Novelty Detection}, Advances in Neural Information Processing Systems 12, 1992. 
     \bibitem{WangCasasent2009} Wang, Y., Casasent, D., \emph{A Support Vector Hierarchical Method for multi-class classification and rejection}, Proc. of Int. Joint Conf. on Neural Networks, 2009.
+    \bibitem{gridsearch} http://scikit-learn.org/stable/modules/grid\_search.html.
+    \bibitem{pybrain} http://pybrain.org/docs/tutorial/fnn.html
 
 
 \end{thebibliography}
