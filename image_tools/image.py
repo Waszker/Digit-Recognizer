@@ -1,7 +1,5 @@
 import numpy
-from skimage.morphology import erosion, dilation, opening, closing, white_tophat
-from skimage.morphology import black_tophat, skeletonize, convex_hull_image
-from skimage.morphology import disk
+from skimage.morphology import erosion, dilation, opening, closing, skeletonize, disk
 from PIL import Image as PImage
 
 default_image_size = (28, 28)
@@ -18,10 +16,11 @@ class Image:
 
     def show(self, new_size=default_image_size):
         # self.image_array = self.invert()
-        self.image_array = self.binarize()
-        self.image_array = self.skeletonize()
-        print "Starting points: " + str(self.count_starting_points())
-        img = PImage.fromarray(self.image_array)
+        img = self.binarize()
+        img = img.skeletonize()
+        print "Starting points: " + str(img.count_starting_points())
+        print "Intersection points: " + str(img.count_intersection_points())
+        img = PImage.fromarray(img.image_array)
         img = img.resize(new_size)
         # img = img.resize(new_size, PIL.Image.ANTIALIAS)
         # k3m.skeletize(img).show()
@@ -35,7 +34,7 @@ class Image:
         """
         mask = disk(mask_size)
         img = dilation(self.image_array, mask)
-        return numpy.uint8(img)
+        return Image(numpy.uint8(img), img.shape, self.correct_class)
 
     def erode(self, mask_size):
         """
@@ -45,7 +44,7 @@ class Image:
         """
         mask = disk(mask_size)
         img = erosion(self.image_array, mask)
-        return numpy.uint8(img)
+        return Image(numpy.uint8(img), img.shape, self.correct_class)
 
     def skeletonize(self):
         """
@@ -55,14 +54,15 @@ class Image:
         img = numpy.asarray(map(lambda x: x / 255, self.image_array))
         img = skeletonize(img)
         img = numpy.asarray(map(lambda x: x * 255, img))
-        return numpy.uint8(img)
+        return Image(numpy.uint8(img), img.shape, self.correct_class)
 
     def invert(self):
         """
         Inverts grayscale image.
         :return: inverted image
         """
-        return numpy.asarray(map(lambda x: 255 - x, self.image_array))
+        img = numpy.asarray(map(lambda x: 255 - x, self.image_array))
+        return Image(numpy.uint8(img), img.shape, self.correct_class)
 
     def binarize(self):
         """
@@ -73,7 +73,7 @@ class Image:
         img = img.convert('1')
         img = Image._read_image_array(numpy.array(img.getdata()), self.image_array.shape)
 
-        return numpy.uint8(img)
+        return Image(numpy.uint8(img), img.shape, self.correct_class)
 
     def count_starting_points(self):
         """
@@ -88,6 +88,22 @@ class Image:
                     starting_points += 1
 
         return starting_points
+
+    def count_intersection_points(self):
+        """
+        Calculates number of intersection points for binary, skeletonized image.
+        Based on article: https://arxiv.org/pdf/1202.3884.pdf
+        :return: number of intersection points
+        """
+        intersection_points = 0
+
+        for i in range(1, self.image_array.shape[0] - 1):
+            for j in range(1, self.image_array.shape[1] - 1):
+                neighbours_count = self.get_pixel_neighbours(i, j)
+                if self._is_binary_image_pixel_black(i, j) and self._is_it_intersection_point(i, j, neighbours_count):
+                    intersection_points += 1
+
+        return intersection_points
 
     def get_pixel_neighbours(self, x, y):
         """
@@ -117,6 +133,65 @@ class Image:
         image_width = self.image_array.shape[0]
         image_height = self.image_array.shape[1]
         return not (x < 0 or x >= image_width or y < 0 or y >= image_height)
+
+    def _is_it_intersection_point(self, i, j, neighbours_count):
+        condition_1 = neighbours_count == 3 and self._is_intersection_with_three(i, j)
+        condition_2 = neighbours_count == 4 and self._is_intersection_with_four(i, j)
+        condition_3 = neighbours_count >= 5
+        return condition_1 or condition_2 or condition_3
+
+    def _is_intersection_with_three(self, i, j):
+        top_left = self._is_binary_image_pixel_black(i - 1, j - 1) and (
+            self._is_binary_image_pixel_black(i - 1, j) or self._is_binary_image_pixel_black(i, j - 1))
+        top_center = self._is_binary_image_pixel_black(i, j - 1) and (
+            self._is_binary_image_pixel_black(i - 1, j - 1) or self._is_binary_image_pixel_black(i + 1, j - 1))
+        top_right = self._is_binary_image_pixel_black(i + 1, j - 1) and (
+            self._is_binary_image_pixel_black(i, j - 1) or self._is_binary_image_pixel_black(i + 1, j))
+        mid_left = self._is_binary_image_pixel_black(i - 1, j) and (
+            self._is_binary_image_pixel_black(i - 1, j - 1) or self._is_binary_image_pixel_black(i - 1, j + 1))
+        mid_right = self._is_binary_image_pixel_black(i + 1, j) and (
+            self._is_binary_image_pixel_black(i + 1, j - 1) or self._is_binary_image_pixel_black(i + 1, j + 1))
+        down_left = self._is_binary_image_pixel_black(i - 1, j + 1) and (
+            self._is_binary_image_pixel_black(i - 1, j) or self._is_binary_image_pixel_black(i, j + 1))
+        down_center = self._is_binary_image_pixel_black(i, j + 1) and (
+            self._is_binary_image_pixel_black(i - 1, j + 1) or self._is_binary_image_pixel_black(i + 1, j + 1))
+        down_right = self._is_binary_image_pixel_black(i + 1, j + 1) and (
+            self._is_binary_image_pixel_black(i, j + 1) or self._is_binary_image_pixel_black(i + 1, j))
+
+        answers = [top_left, top_center, top_right, mid_left, mid_right, down_left, down_center, down_right]
+
+        return all(answers)
+
+    def _is_intersection_with_four(self, i, j):
+        return self._are_all_diagonal_intersections(i, j) and self._are_all_central_intersections(i, j)
+
+    def _are_all_diagonal_intersections(self, i, j):
+        top_left = self._is_binary_image_pixel_black(i - 1, j - 1) and (
+            not (self._is_binary_image_pixel_black(i - 1, j) or self._is_binary_image_pixel_black(i, j - 1)))
+        top_right = self._is_binary_image_pixel_black(i + 1, j - 1) and (
+            not (self._is_binary_image_pixel_black(i, j - 1) or self._is_binary_image_pixel_black(i + 1, j)))
+        down_left = self._is_binary_image_pixel_black(i - 1, j + 1) and (
+            not (self._is_binary_image_pixel_black(i - 1, j) or self._is_binary_image_pixel_black(i, j + 1)))
+        down_right = self._is_binary_image_pixel_black(i + 1, j + 1) and (
+            not (self._is_binary_image_pixel_black(i, j + 1) or self._is_binary_image_pixel_black(i + 1, j)))
+
+        answers = [top_left, top_right, down_left, down_right]
+
+        return not all(answers)
+
+    def _are_all_central_intersections(self, i, j):
+        top_center = self._is_binary_image_pixel_black(i, j - 1) and (
+            not (self._is_binary_image_pixel_black(i - 1, j - 1) or self._is_binary_image_pixel_black(i + 1, j - 1)))
+        mid_left = self._is_binary_image_pixel_black(i - 1, j) and (
+            not (self._is_binary_image_pixel_black(i - 1, j - 1) or self._is_binary_image_pixel_black(i - 1, j + 1)))
+        mid_right = self._is_binary_image_pixel_black(i + 1, j) and (
+            not (self._is_binary_image_pixel_black(i + 1, j - 1) or self._is_binary_image_pixel_black(i + 1, j + 1)))
+        down_center = self._is_binary_image_pixel_black(i, j + 1) and (
+            not (self._is_binary_image_pixel_black(i - 1, j + 1) or self._is_binary_image_pixel_black(i + 1, j + 1)))
+
+        answers = [top_center, mid_left, mid_right, down_center]
+
+        return not all(answers)
 
     @staticmethod
     def _read_image_array(pixel_values, image_dimensions):
