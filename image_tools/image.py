@@ -14,12 +14,23 @@ class Image:
         self.correct_class = correct_class
         self.image_array = Image._read_image_array(pixel_values, image_dimensions)
 
+    def get_representative_vector(self):
+        """
+        Creates vector representation of image characteristics. To be used as input for classifier.
+        :return: vector representation
+        """
+        image = self.binarize()
+        image = image.skeletonize()
+        vector = image.image_array.ravel()
+        vector = numpy.concatenate((vector, image.count_starting_points()), axis = 1)
+        vector = numpy.concatenate((vector, image.count_intersection_points()), axis = 1)
+
+        return vector
+
     def show(self, new_size=default_image_size):
         # self.image_array = self.invert()
         img = self.binarize()
         img = img.skeletonize()
-        print "Starting points: " + str(img.count_starting_points())
-        print "Intersection points: " + str(img.count_intersection_points())
         img = PImage.fromarray(img.image_array)
         img = img.resize(new_size)
         # img = img.resize(new_size, PIL.Image.ANTIALIAS)

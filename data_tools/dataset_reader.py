@@ -1,6 +1,6 @@
 import os
 from numpy import genfromtxt
-from image import Image
+from image_tools.image import Image
 
 
 class DatasetReader:
