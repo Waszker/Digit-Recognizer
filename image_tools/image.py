@@ -17,13 +17,13 @@ class Image:
     def get_representative_vector(self):
         """
         Creates vector representation of image characteristics. To be used as input for classifier.
-        :return: vector representation
+        :return: horizontal vector representation
         """
         image = self.binarize()
         image = image.skeletonize()
         vector = image.image_array.ravel()
-        vector = numpy.concatenate((vector, image.count_starting_points()), axis = 1)
-        vector = numpy.concatenate((vector, image.count_intersection_points()), axis = 1)
+        vector = numpy.concatenate((vector, [image.count_starting_points()]))
+        vector = numpy.concatenate((vector, [image.count_intersection_points()]))
 
         return vector
 
