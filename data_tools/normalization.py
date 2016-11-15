@@ -52,7 +52,7 @@ def _normalize_image(image, dataset, min_vector, difference_vector):
     row = image.get_representative_vector()
     for i in range(0, len(difference_vector)):
         if difference_vector[i] == 0:
-            row[i] = 1
+            row[i] = 0
         else:
             row[i] = (row[i] - min_vector[i]) / difference_vector[i]
     dataset.append(row)

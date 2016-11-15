@@ -13,6 +13,8 @@ class Image:
     def __init__(self, pixel_values, image_dimensions=default_image_size, correct_class=None):
         self.correct_class = correct_class
         self.image_array = Image._read_image_array(pixel_values, image_dimensions)
+        self.image_width = self.image_array.shape[0]
+        self.image_height = self.image_array.shape[1]
 
     def get_representative_vector(self):
         """
@@ -21,7 +23,8 @@ class Image:
         """
         image = self.binarize()
         image = image.skeletonize()
-        vector = image.image_array.ravel()
+        # vector = image.image_array.ravel()
+        vector = numpy.asarray([self._get_black_pixels_count()])
         vector = numpy.concatenate((vector, [image.count_starting_points()]))
         vector = numpy.concatenate((vector, [image.count_intersection_points()]))
 
@@ -93,8 +96,8 @@ class Image:
         """
         starting_points = 0
 
-        for i in range(0, self.image_array.shape[0]):
-            for j in range(0, self.image_array.shape[1]):
+        for i in range(0, self.image_width):
+            for j in range(0, self.image_height):
                 if self._is_binary_image_pixel_black(i, j) and self.get_pixel_neighbours(i, j) == 1:
                     starting_points += 1
 
@@ -108,8 +111,8 @@ class Image:
         """
         intersection_points = 0
 
-        for i in range(1, self.image_array.shape[0] - 1):
-            for j in range(1, self.image_array.shape[1] - 1):
+        for i in range(1, self.image_width - 1):
+            for j in range(1, self.image_height - 1):
                 neighbours_count = self.get_pixel_neighbours(i, j)
                 if self._is_binary_image_pixel_black(i, j) and self._is_it_intersection_point(i, j, neighbours_count):
                     intersection_points += 1
@@ -140,10 +143,16 @@ class Image:
         black_values = [1, 255]
         return self.image_array[x][y] in black_values
 
+    def _get_black_pixels_count(self):
+        count = 0
+        for i in range(1, self.image_width):
+            for j in range(1, self.image_height):
+                if self._is_binary_image_pixel_black(i, j):
+                    count += 1
+        return count
+
     def _are_coordinates_within_image(self, x, y):
-        image_width = self.image_array.shape[0]
-        image_height = self.image_array.shape[1]
-        return not (x < 0 or x >= image_width or y < 0 or y >= image_height)
+        return not (x < 0 or x >= self.image_width or y < 0 or y >= self.image_height)
 
     def _is_it_intersection_point(self, i, j, neighbours_count):
         condition_1 = neighbours_count == 3 and self._is_intersection_with_three(i, j)

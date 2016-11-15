@@ -13,45 +13,50 @@ from sklearn.pipeline import Pipeline
 
 
 class Classifier:
-    def __init__(self, trainingSet, testSet, trainingLabels=None, testLabels=None):
+    def __init__(self, dataset):
         """
         TODO: Add description
-        :param trainingSet: set containing data to train classifier
-        :param testSet: set containing data to test classifier
-        :param trainingLabels: proper classes of training data
-        :param testLabels: (optional) proper classes of test data
+        :param training_set: set containing data to train classifier
+        :param test_set: set containing data to test classifier
+        :param training_labels: proper classes of training data
+        :param test_labels: (optional) proper classes of test data
         :return:
         """
         self.classifier = None
-        self.trainingset = trainingSet
-        self.testset = testSet
-        self.traininglabels = trainingLabels
-        self.testlabels = testLabels
+        self.training_set = dataset.training_data
+        self.test_set = dataset.test_data
+        self.training_labels = dataset.training_labels
+        self.test_labels = dataset.test_labels
 
-    def train(self, classifier_name, parameters):
+    def train(self, classifier_name, parameters=None):
         """
-        TODO: Add description
-        :param classifier_name:
-        :param parameters:
-        :return:
+        Trains selected classifier on provided training data. Raises exception if wrong classifier name was provided.
+        :param classifier_name: one of available classifier names:
+                * 'svm': SVM,
+                * 'rf': Random Forests,
+                * 'knn': kNN,
+                * 'lr': Linear Regression,
+                * 'br': Bayessian Regression,
+                * 'llr': Logistic Regression,
+                * 'plr': Polynomial Regression,
+        :param parameters: optional parameters for specified classifier
         """
         self.classifier = self._get_proper_classifier(classifier_name, parameters)
-        if self.classifier is not None:
-            self.classifier.fit(self.trainingset, self.traininglabels)
+        self.classifier.fit(self.training_set, self.training_labels)
 
-    def test(self, parameters):
+    def test(self):
         """
-        TODO: Add description
-        :param parameters:
-        :return:
+        Runs classification tests on previously trained classifier.
+        :returns table holding classifier's predictions
         """
         if self.classifier is None:
             raise ValueError("Classifier not trained yet!")
-        predictions = np.zeros(len(self.testset))
-        for i in range(0, len(self.testset)):
-            points = self.testset[i]
-            for point in points:
-                predictions[i] = self.classifier.predict(point)
+        predictions = np.zeros(self.test_set.shape[0])
+        index = 0
+        for row in self.test_set:
+            predictions[index] = self.classifier.predict(row.reshape(1, -1))
+            index += 1
+
         return predictions
 
     def _get_svm(self, parameters):
@@ -117,4 +122,4 @@ class Classifier:
                 'plr': self._get_polynomial_regression(parameters),
             }[classifier_name]
         except KeyError:
-            return None
+            raise ValueError("Specify proper classifier name")
