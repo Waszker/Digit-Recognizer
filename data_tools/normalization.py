@@ -50,9 +50,10 @@ def _append_image_vector(dataset_list, image):
 
 def _normalize_image(image, dataset, min_vector, difference_vector):
     row = image.get_representative_vector()
+    row = np.asarray(row).astype(float)
     for i in range(0, len(difference_vector)):
         if difference_vector[i] == 0:
             row[i] = 0
         else:
-            row[i] = (row[i] - min_vector[i]) / difference_vector[i]
+            row[i] = float(row[i] - min_vector[i]) / difference_vector[i]
     dataset.append(row)
