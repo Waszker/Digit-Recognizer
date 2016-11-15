@@ -32,14 +32,14 @@ def _prepare_training_data():
 def _run_classification():
     print "Reading data"
     reader = DatasetReader("Datasets")
-    dataset = Dataset(reader.read_normalized_data_for_classifier(), division_ratio=0.3)
+    dataset = Dataset(reader.read_normalized_data_for_classifier(), division_ratio=0.7)
 
-    # network = ClassificationNetwork(dataset.training_data, dataset.test_data, training_labels=dataset.labels)
-    # print "Network error: " + str(network.train(iteration_count=10))
+    network = ClassificationNetwork(dataset.training_data, dataset.test_data, training_labels=dataset.training_labels)
+    print "Network error: " + str(network.train(iteration_count=10))
 
     print "Training classifier on: " + str(dataset.training_data.shape[0]) + " samples"
     classifier = Classifier(dataset)
-    classifier.train('llr')
+    classifier.train('rf')
 
     print "Testing classifier"
     predictions = classifier.test()
@@ -56,6 +56,7 @@ def _run_classification():
 
 
 if __name__ == "__main__":
+    # _prepare_training_data()
     _run_classification()
     # data[0].show(new_size=(300, 300))
     # data[1].show(new_size=(300, 300))
