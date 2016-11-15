@@ -15,20 +15,23 @@ class Image:
         self.image_array = Image._read_image_array(pixel_values, image_dimensions)
         self.image_width = self.image_array.shape[0]
         self.image_height = self.image_array.shape[1]
+        self.representative_vector = None
 
     def get_representative_vector(self):
         """
         Creates vector representation of image characteristics. To be used as input for classifier.
         :return: horizontal vector representation
         """
-        image = self.binarize()
-        image = image.skeletonize()
-        # vector = image.image_array.ravel()
-        vector = numpy.asarray([self._get_black_pixels_count()])
-        vector = numpy.concatenate((vector, [image.count_starting_points()]))
-        vector = numpy.concatenate((vector, [image.count_intersection_points()]))
+        if self.representative_vector is None:
+            image = self.binarize()
+            image = image.skeletonize()
+            # vector = image.image_array.ravel()
+            vector = list([self._get_black_pixels_count()])
+            vector.append(image.count_starting_points())
+            vector.append(image.count_intersection_points())
+            self.representative_vector = numpy.asarray(vector)
 
-        return vector
+        return self.representative_vector
 
     def show(self, new_size=default_image_size):
         # self.image_array = self.invert()
