@@ -27,6 +27,7 @@ class Image:
             image = image.skeletonize()
             # vector = image.image_array.ravel()
             vector = list([self._get_black_pixels_count()])
+            vector.extend(self._shrink_image_array())
             vector.append(image.count_starting_points())
             vector.append(image.count_intersection_points())
             self.representative_vector = numpy.asarray(vector)
@@ -215,6 +216,22 @@ class Image:
         answers = [top_center, mid_left, mid_right, down_center]
 
         return not all(answers)
+
+    def _shrink_image_array(self, mask_size=(4, 4)):
+        if not (self.image_width % mask_size[0] == 0 or self.image_height % mask_size[1] == 0):
+            raise ValueError("Mask size must fit within image dimensions")
+
+        shrinked = []
+        for i in range(0, self.image_width, mask_size[0]):
+            for j in range(0, self.image_height, mask_size[1]):
+                value = 0.
+                for ii in range(0, mask_size[0]):
+                    for jj in range(0, mask_size[1]):
+                        value += self.image_array[i+ii][j+jj]
+                value /= mask_size[0] * mask_size[1]
+                shrinked.append(value)
+
+        return shrinked
 
     @staticmethod
     def _read_image_array(pixel_values, image_dimensions):

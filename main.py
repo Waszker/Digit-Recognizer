@@ -34,25 +34,29 @@ def _run_classification():
     reader = DatasetReader("Datasets")
     dataset = Dataset(reader.read_normalized_data_for_classifier(), division_ratio=0.7)
 
-    network = ClassificationNetwork(dataset.training_data, dataset.test_data, training_labels=dataset.training_labels)
-    print "Network error: " + str(network.train(iteration_count=10))
+    # network = ClassificationNetwork(dataset.training_data, dataset.test_data, training_labels=dataset.training_labels)
+    # print "Network error: " + str(network.train(iteration_count=10))
 
     print "Training classifier on: " + str(dataset.training_data.shape[0]) + " samples"
+
     classifier = Classifier(dataset)
-    classifier.train('rf')
+    classifiers = ['svm', 'rf', 'knn', 'lr', 'br', 'llr', 'plr']
+    for c in classifiers:
+        print "Starting classifier: " + str(c)
+        classifier.train(c)
 
-    print "Testing classifier"
-    predictions = classifier.test()
+        print "Testing classifier " + str(c)
+        predictions = classifier.test()
 
-    index = 0
-    sum = 0
-    all = 0
-    for prediction in predictions:
-        if dataset.test_labels[index] == prediction:
-            sum += 1
-        all += 1
-        index += 1
-    print "All in all error rate is: " + str(1.0 - float(sum) / all)
+        index = 0
+        sum = 0
+        all = 0
+        for prediction in predictions:
+            if dataset.test_labels[index] == prediction:
+                sum += 1
+            all += 1
+            index += 1
+        print "All in all error rate for " + str(c) + " is: " + str(1.0 - float(sum) / all)
 
 
 if __name__ == "__main__":
