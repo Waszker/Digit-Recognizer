@@ -37,6 +37,7 @@ class Image:
     def show(self, new_size=default_image_size):
         # self.image_array = self.invert()
         img = self.binarize()
+        img = img.dilate(2)
         img = img.skeletonize()
         img = PImage.fromarray(img.image_array)
         img = img.resize(new_size)

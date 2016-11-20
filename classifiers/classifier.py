@@ -36,7 +36,7 @@ class Classifier:
                 * 'rf': Random Forests,
                 * 'knn': kNN,
                 * 'lr': Linear Regression,
-                * 'br': Bayessian Regression,
+                * 'br': Bayesian Regression,
                 * 'llr': Logistic Regression,
                 * 'plr': Polynomial Regression,
         :param parameters: optional parameters for specified classifier

@@ -40,7 +40,7 @@ def _run_classification():
     print "Training classifier on: " + str(dataset.training_data.shape[0]) + " samples"
 
     classifier = Classifier(dataset)
-    classifiers = ['svm', 'rf', 'knn', 'lr', 'br', 'llr', 'plr']
+    classifiers = ['svm', 'rf', 'knn', 'lr', 'br', 'llr']
     for c in classifiers:
         print "Starting classifier: " + str(c)
         classifier.train(c)
@@ -49,18 +49,18 @@ def _run_classification():
         predictions = classifier.test()
 
         index = 0
-        sum = 0
-        all = 0
+        positive_count = 0
+        all_samples = 0
         for prediction in predictions:
             if dataset.test_labels[index] == prediction:
-                sum += 1
-            all += 1
+                positive_count += 1
+            all_samples += 1
             index += 1
-        print "All in all error rate for " + str(c) + " is: " + str(1.0 - float(sum) / all)
+        print "All in all error rate for " + str(c) + " is: " + str(1.0 - float(positive_count) / all_samples)
 
 
 if __name__ == "__main__":
-    # _prepare_training_data()
+    _prepare_training_data()
     _run_classification()
     # data[0].show(new_size=(300, 300))
     # data[1].show(new_size=(300, 300))
