@@ -57,6 +57,7 @@ def _normalize_image(image, dataset, min_vector, difference_vector):
     row = np.asarray(row).astype(float)
     for i in range(0, len(difference_vector)):
         if difference_vector[i] == 0:
+            # TODO: Maybe delete rows where diff is zero?
             row[i] = 0
         else:
             row[i] = float(row[i] - min_vector[i]) / difference_vector[i]

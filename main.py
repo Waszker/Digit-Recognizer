@@ -64,7 +64,7 @@ def _run_classification():
 
 
 if __name__ == "__main__":
-    _prepare_training_data()
+    # _prepare_training_data()
     _run_classification()
     # reader = DatasetReader("Datasets")
     # data = reader.read_training_csv_set()
