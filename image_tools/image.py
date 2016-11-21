@@ -13,8 +13,8 @@ class Image:
     def __init__(self, pixel_values, image_dimensions=default_image_size, correct_class=None):
         self.correct_class = correct_class
         self.image_array = Image._read_image_array(pixel_values, image_dimensions)
-        self.image_width = self.image_array.shape[0]
-        self.image_height = self.image_array.shape[1]
+        self.image_width = self.image_array.shape[1]
+        self.image_height = self.image_array.shape[0]
         self.representative_vector = None
 
     def get_representative_vector(self):
@@ -30,6 +30,7 @@ class Image:
             vector.extend(self._shrink_image_array())
             vector.append(image.count_starting_points())
             vector.append(image.count_intersection_points())
+            vector.extend(image.get_intersections_vector())
             self.representative_vector = numpy.asarray(vector)
 
         return self.representative_vector
@@ -39,6 +40,9 @@ class Image:
         img = self.binarize()
         img = img.dilate(2)
         img = img.skeletonize()
+        print 'Starting points ' + str(img.count_starting_points())
+        print 'Intersection points ' + str(img.count_intersection_points())
+        print img.get_intersections_vector()
         img = PImage.fromarray(img.image_array)
         img = img.resize(new_size)
         # img = img.resize(new_size, PIL.Image.ANTIALIAS)
@@ -144,9 +148,33 @@ class Image:
 
         return neighbours_count
 
+    def get_intersections_vector(self):
+        """
+        Calculates number of intersections with line at certain width and height values on binary image.
+        Algorithm counts intersections with line at 30%, 50% and 70% of image width/height.
+        :return: vector containing number of intersections at 30%, 50% and 70% of image width and height
+        """
+        width_values = self._get_symbol_starting_and_ending_width()
+        height_values = self._get_symbol_starting_and_ending_height()
+
+        width_step = (float(width_values[1] - width_values[0])) / 10
+        height_step = (float(height_values[1] - height_values[0])) / 10
+
+        step_coefficients = [3, 5, 7]  # 30%, 50%, 70% of image width/height
+        intersection_vector = []
+
+        for coefficient in step_coefficients:
+            intersection_vector.append(
+                self._get_intersection_count_heightwise(width_values[0] + int(coefficient * width_step)))
+        for coefficient in step_coefficients:
+            intersection_vector.append(
+                self._get_intersection_count_widewise(height_values[0] + int(coefficient * height_step)))
+
+        return intersection_vector
+
     def _is_binary_image_pixel_black(self, x, y):
         black_values = [1, 255]
-        return self.image_array[x][y] in black_values
+        return self.image_array[y][x] in black_values
 
     def _get_black_pixels_count(self):
         count = 0
@@ -228,11 +256,83 @@ class Image:
                 value = 0.
                 for ii in range(0, mask_size[0]):
                     for jj in range(0, mask_size[1]):
-                        value += self.image_array[i+ii][j+jj]
+                        value += self.image_array[i + ii][j + jj]
                 value /= mask_size[0] * mask_size[1]
                 shrinked.append(value)
 
         return shrinked
+
+    def _get_symbol_starting_and_ending_width(self):
+        starting_width, ending_width = 0, 0
+
+        try:
+            for x in range(0, self.image_width):
+                for y in range(0, self.image_height):
+                    if self._is_binary_image_pixel_black(x, y):
+                        starting_width = x
+                        raise ValueError
+        except ValueError:
+            pass
+
+        try:
+            for x in range(self.image_width - 1, starting_width, -1):
+                for y in range(0, self.image_height):
+                    if self._is_binary_image_pixel_black(x, y):
+                        ending_width = x
+                        raise ValueError
+        except ValueError:
+            pass
+
+        return starting_width, ending_width
+
+    def _get_symbol_starting_and_ending_height(self):
+        starting_height, ending_height = 0, 0
+
+        try:
+            for y in range(0, self.image_height):
+                for x in range(0, self.image_width):
+                    if self._is_binary_image_pixel_black(x, y):
+                        starting_height = y
+                        raise ValueError
+        except ValueError:
+            pass
+
+        try:
+            for y in range(self.image_height - 1, starting_height, -1):
+                for x in range(0, self.image_width):
+                    if self._is_binary_image_pixel_black(x, y):
+                        ending_height = y
+                        raise ValueError
+        except ValueError:
+            pass
+
+        return starting_height, ending_height
+
+    def _get_intersection_count_widewise(self, line_y):
+        intersections = 0
+        was_previously_black = False
+
+        for i in range(0, self.image_width):
+            if self._is_binary_image_pixel_black(i, line_y) and not was_previously_black:
+                intersections += 1
+                was_previously_black = True
+            elif not self._is_binary_image_pixel_black(i, line_y):
+                was_previously_black = False
+
+        return intersections
+
+    def _get_intersection_count_heightwise(self, line_x):
+        intersections = 0
+        was_previously_black = False
+
+        for i in range(0, self.image_height):
+            if self._is_binary_image_pixel_black(line_x, i) and not was_previously_black:
+                intersections += 1
+                was_previously_black = True
+            elif not self._is_binary_image_pixel_black(line_x, i):
+                was_previously_black = False
+
+        return intersections
 
     @staticmethod
     def _read_image_array(pixel_values, image_dimensions):

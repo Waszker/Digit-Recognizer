@@ -32,11 +32,14 @@ class Normalizer:
         pool = mp.Pool()
         manager = mp.Manager()
         dataset = manager.list()
+        image_dataset = manager.list()
         for image in image_list:
-            pool.apply_async(_append_image_vector, args=(dataset, image))
+            pool.apply_async(_append_image_vector, args=(dataset, image_dataset, image))
         pool.close()
         pool.join()
         dataset = np.asarray(dataset)
+        del image_list[:]
+        image_list.extend(image_dataset)
 
         min_vector = np.amin(dataset, axis=0)
         max_vector = np.amax(dataset, axis=0)
@@ -44,8 +47,9 @@ class Normalizer:
         return min_vector, max_vector
 
 
-def _append_image_vector(dataset_list, image):
+def _append_image_vector(dataset_list, image_dataset, image):
     dataset_list.append(image.get_representative_vector())
+    image_dataset.append(image)
 
 
 def _normalize_image(image, dataset, min_vector, difference_vector):

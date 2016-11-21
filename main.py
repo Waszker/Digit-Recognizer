@@ -4,6 +4,7 @@ from data_tools.normalization import Normalizer
 from classifiers.classifier import Classifier
 from classifiers.neural_network import ClassificationNetwork
 import numpy as np
+import time
 
 
 def _prepare_training_data():
@@ -21,9 +22,12 @@ def _prepare_training_data():
 
     # Get normalized data
     print "Normalizing data"
+    start_time = time.time()
     normalizer = Normalizer(data)
-    print 'Finished normalizing training data'
+    print 'Finished getting normalization vectors ' + str(time.time() - start_time)
+    start_time = time.time()
     normalized_data = normalizer.get_normalized_data_matrix(data)
+    print 'Finished normalizing training data in ' + str(time.time() - start_time)
     normalized_data = np.concatenate((labels, normalized_data), axis=1)
     print normalized_data.shape
     np.savetxt("Datasets/normalized_training_data.csv", normalized_data, delimiter=",")
@@ -62,6 +66,8 @@ def _run_classification():
 if __name__ == "__main__":
     _prepare_training_data()
     _run_classification()
+    # reader = DatasetReader("Datasets")
+    # data = reader.read_training_csv_set()
     # data[0].show(new_size=(300, 300))
     # data[1].show(new_size=(300, 300))
     # data[2].show(new_size=(300, 300))
