@@ -2,7 +2,7 @@ from data_tools.dataset_reader import DatasetReader
 from data_tools.dataset import Dataset
 from data_tools.normalization import Normalizer
 from classifiers.classifier import Classifier
-from classifiers.neural_network import ClassificationNetwork
+from classifiers.neural_network import SoftmaxNetwork
 import numpy as np
 import time
 
@@ -37,19 +37,19 @@ def _run_classification():
     print "Reading data"
     reader = DatasetReader("Datasets")
     dataset = Dataset(reader.read_normalized_data_for_classifier(), division_ratio=0.7)
+    print "Training classifier on: " + str(dataset.training_data.shape) + " samples"
 
-    # network = ClassificationNetwork(dataset.training_data, dataset.test_data, training_labels=dataset.training_labels)
-    # print "Network error: " + str(network.train(iteration_count=10))
+    # TensorFlow tests
+    network = SoftmaxNetwork(dataset.training_data, dataset.test_data, training_labels=dataset.training_labels,
+                             test_labels=dataset.test_labels)
+    network.train(iteration_count=1000)
+    print "Error rate for TensorFlow is: " + str(1 - network.test())
 
-    print "Training classifier on: " + str(dataset.training_data.shape[0]) + " samples"
-
+    # Other classifier tests
     classifier = Classifier(dataset)
     classifiers = ['svm', 'rf', 'knn', 'lr', 'br', 'llr']
     for c in classifiers:
-        print "Starting classifier: " + str(c)
         classifier.train(c)
-
-        print "Testing classifier " + str(c)
         predictions = classifier.test()
 
         index = 0
@@ -60,11 +60,11 @@ def _run_classification():
                 positive_count += 1
             all_samples += 1
             index += 1
-        print "All in all error rate for " + str(c) + " is: " + str(1.0 - float(positive_count) / all_samples)
+        print "Error rate for " + str(c) + " is: " + str(1.0 - float(positive_count) / all_samples)
 
 
 if __name__ == "__main__":
-    _prepare_training_data()
+    # _prepare_training_data()
     _run_classification()
     # reader = DatasetReader("Datasets")
     # data = reader.read_training_csv_set()
