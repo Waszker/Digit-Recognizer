@@ -25,7 +25,7 @@ class Normalizer:
         pool.close()
         pool.join()
 
-        return np.asarray(dataset)
+        return self._delete_zero_columns(np.asarray(dataset))
 
     @staticmethod
     def _get_min_max_vectors(image_list):
@@ -46,6 +46,11 @@ class Normalizer:
 
         return min_vector, max_vector
 
+    def _delete_zero_columns(self, data):
+        difference = np.tile(np.asarray(self.difference_vector), (2, 1))
+        zero_columns = np.nonzero(difference.sum(axis=0) == 0)
+        return np.delete(data, zero_columns, axis=1)
+
 
 def _append_image_vector(dataset_list, image_dataset, image):
     dataset_list.append(image.get_representative_vector())
@@ -57,7 +62,6 @@ def _normalize_image(image, dataset, min_vector, difference_vector):
     row = np.asarray(row).astype(float)
     for i in range(0, len(difference_vector)):
         if difference_vector[i] == 0:
-            # TODO: Maybe delete rows where diff is zero?
             row[i] = 0
         else:
             row[i] = float(row[i] - min_vector[i]) / difference_vector[i]
