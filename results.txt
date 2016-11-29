@@ -1,0 +1,97 @@
+################################### SKELETONIZED ###############################################
+Normalized full input with starting_points/intersection_points/intersections_vector:
+Training classifier on: (29399, 667) samples
+Error rate for TensorFlow is: 0.371478438377
+Error rate for svm is: 0.840568208872
+Error rate for rf is: 0.344734544877
+Error rate for knn is: 0.446472502182
+Error rate for lr is: 1.0
+Error rate for br is: 1.0
+Error rate for llr is: 0.365209110388
+
+
+Just normalized full input:
+Training classifier on: (29399, 659) samples
+Error rate for TensorFlow is: 0.139830172062
+Error rate for svm is: 0.816998650901
+Error rate for rf is: 0.134116339973
+Error rate for knn is: 0.229108800889
+Error rate for lr is: 1.0
+Error rate for br is: 1.0
+Error rate for llr is: 0.132132370447
+
+
+Just (not normalized!!!!) full input with deleting zero columns:
+Training classifier on: (29399, 659) samples
+Error rate for TensorFlow is: 0.281961739063
+Error rate for svm is: 0.888104118721
+Error rate for rf is: 0.0956273311642
+Error rate for knn is: 0.197524006031
+Error rate for lr is: 1.0
+Error rate for br is: 1.0
+
+
+Just normalized full input without deleting zero columns:
+Training classifier on: (29399, 784) samples
+Error rate for TensorFlow is: 0.141020536423
+Error rate for svm is: 0.819141337989
+Error rate for rf is: 0.128799301643
+Error rate for knn is: 0.229902388699
+Error rate for lr is: 1.0
+Error rate for br is: 1.0
+Error rate for llr is: 0.130941988731
+
+
+
+################################### NOT SKELETONIZED ###############################################
+Normalized full input with starting_points/intersection_points/intersections_vector:
+Training classifier on: (29399, 716) samples
+Error rate for TensorFlow is: 0.456709802151
+Error rate for svm is: 0.843028331085
+Error rate for rf is: 0.420125386874
+Error rate for knn is: 0.449726212205
+Error rate for lr is: 1.0
+Error rate for br is: 1.0
+Error rate for llr is: 0.454963891755
+
+
+Normalized full input with starting_points/intersection_points/intersections_vector without removing zero columns:
+Training classifier on: (29399, 792) samples
+Error rate for TensorFlow is: 0.469962716103
+Error rate for svm is: 0.845488453297
+Error rate for rf is: 0.437663677486
+Error rate for knn is: 0.489008808825
+Error rate for lr is: 1.0
+Error rate for br is: 1.0
+Error rate for llr is: 0.470756289183
+
+
+Just normalized full input without deleting zero columns:
+Training classifier on: (29399, 784) samples
+Error rate for TensorFlow is: 0.134751200676
+Error rate for svm is: 0.740893579875
+Error rate for rf is: 0.0816601856995
+Error rate for knn is: 0.08245377351
+Error rate for lr is: 1.0
+Error rate for br is: 1.0
+Error rate for llr is: 0.141972859297
+
+
+Just (not normalized!!!!) full input:
+Training classifier on: (29399, 708) samples
+Error rate for TensorFlow is: 0.11221331358
+Error rate for svm is: 0.888104118721
+Error rate for rf is: 0.037219268312
+Error rate for knn is: 0.0382509324657
+Error rate for lr is: 1.0
+Error rate for br is: 1.0
+
+Just (not normalized!!!!) full input without deleting zero columns:
+Training classifier on: (29399, 784) samples
+Error rate for TensorFlow is: 0.100388884544
+Error rate for svm is: 0.888104118721
+Error rate for rf is: 0.0358701690342
+Error rate for knn is: 0.0344417109753
+Error rate for lr is: 1.0
+Error rate for br is: 1.0
+Error rate for llr is: 0.0986429648441

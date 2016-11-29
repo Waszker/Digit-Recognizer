@@ -23,14 +23,14 @@ class Image:
         :return: horizontal vector representation
         """
         if self.representative_vector is None:
-            image = self.binarize()
-            image = image.skeletonize()
-            # vector = image.image_array.ravel()
-            vector = list([self._get_black_pixels_count()])
-            vector.extend(self._shrink_image_array())
-            vector.append(image.count_starting_points())
-            vector.append(image.count_intersection_points())
-            vector.extend(image.get_intersections_vector())
+            # image = self.binarize()
+            # image = image.skeletonize()
+            vector = self.image_array.ravel().tolist()
+            # vector = list([self._get_black_pixels_count()])
+            # vector.extend(self._shrink_image_array())
+            # vector.append(image.count_starting_points())
+            # vector.append(image.count_intersection_points())
+            # vector.extend(image.get_intersections_vector())
             self.representative_vector = numpy.asarray(vector)
 
         return self.representative_vector
