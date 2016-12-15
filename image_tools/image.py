@@ -23,23 +23,40 @@ class Image:
         :return: horizontal vector representation
         """
         if self.representative_vector is None:
-            # image = self.binarize()
-            # image = image.skeletonize()
             vector = self.image_array.ravel().tolist()
+
+            image = self.binarize()
+            image = image.dilate(1)
+            image = image.erode(1)
+            image = image.dilate(1)
+            image = image.skeletonize()
             # vector = list([self._get_black_pixels_count()])
             # vector.extend(self._shrink_image_array())
-            # vector.append(image.count_starting_points())
-            # vector.append(image.count_intersection_points())
-            # vector.extend(image.get_intersections_vector())
+            vector.append(image.count_starting_points())
+            vector.append(image.count_intersection_points())
+            vector.extend(image.get_intersections_vector())
             self.representative_vector = numpy.asarray(vector)
 
         return self.representative_vector
 
     def show(self, new_size=default_image_size):
-        # self.image_array = self.invert()
+        # Show original image
+        img = PImage.fromarray(self.image_array)
+        img = img.resize(new_size)
+        img.show()
+
+        # Show image after opening
         img = self.binarize()
-        img = img.dilate(2)
+        img = img.dilate(1)
+        img = img.erode(1)
+        img = img.dilate(1)
+        img2 = PImage.fromarray(img.image_array)
+        img2 = img2.resize(new_size)
+        img2.show()
+
+        # Show skeletonized image
         img = img.skeletonize()
+        print 'This is ' + str(self.correct_class)
         print 'Starting points ' + str(img.count_starting_points())
         print 'Intersection points ' + str(img.count_intersection_points())
         print img.get_intersections_vector()

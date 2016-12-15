@@ -3,6 +3,7 @@ from data_tools.dataset import Dataset
 from data_tools.normalization import Normalizer
 from classifiers.classifier import Classifier
 from classifiers.neural_network import SoftmaxNetwork
+from classifiers.backpropagation import Backpropagation
 import numpy as np
 import time
 
@@ -38,29 +39,56 @@ def _run_classification():
     reader = DatasetReader("Datasets")
     dataset = Dataset(reader.read_normalized_data_for_classifier(), division_ratio=0.7)
     print "Training classifier on: " + str(dataset.training_data.shape) + " samples"
+    distribution1, distribution2 = dataset.get_classes_distribution()
+    print "Class distribution for training data: " + str(distribution1)
+    print "Class distribution for test data: " + str(distribution2)
 
     # TensorFlow tests
     network = SoftmaxNetwork(dataset.training_data, dataset.test_data, training_labels=dataset.training_labels,
                              test_labels=dataset.test_labels)
-    network.train(iteration_count=1000)
-    print "Error rate for TensorFlow is: " + str(1 - network.test())
+    network.train(iteration_count=2000)
+    [accuracy, predictions] = network.test()
+    index, all_samples_v, correct_samples_v = 0, np.array([0.] * 10), np.array([0.] * 10)
+    for prediction in predictions:
+        all_samples_v[prediction] += 1
+        if dataset.test_labels[index] == prediction:
+            correct_samples_v[prediction] += 1
+        index += 1
+    print "All samples: " + str(all_samples_v)
+    print "Samples result vector: " + str(correct_samples_v / all_samples_v)
+    print "Error rate for SoftmaxNetwork is: " + str(1 - accuracy)
+
+    network = Backpropagation(dataset.training_data, dataset.test_data, training_labels=dataset.training_labels,
+                             test_labels=dataset.test_labels)
+    network.train(iteration_count=2000)
+    [accuracy, predictions] = network.test()
+    index, all_samples_v, correct_samples_v = 0, np.array([0.] * 10), np.array([0.] * 10)
+    for prediction in predictions:
+        all_samples_v[prediction] += 1
+        if dataset.test_labels[index] == prediction:
+            correct_samples_v[prediction] += 1
+        index += 1
+    print "Samples result vector: " + str(correct_samples_v / all_samples_v)
+    print "Error rate for Backpropagation is: " + str(1 - accuracy)
 
     # Other classifier tests
     classifier = Classifier(dataset)
-    classifiers = ['svm', 'rf', 'knn', 'lr', 'br', 'llr']
+    classifiers = ['svm', 'rf', 'knn', 'llr']
     for c in classifiers:
         classifier.train(c)
         predictions = classifier.test()
 
-        index = 0
-        positive_count = 0
-        all_samples = 0
+        index, positive_count, all_samples = 0, 0, 0
+        all_samples_v, correct_samples_v = np.array([0.] * 10), np.array([0.] * 10)
         for prediction in predictions:
+            all_samples_v[prediction] += 1
             if dataset.test_labels[index] == prediction:
                 positive_count += 1
+                correct_samples_v[prediction] += 1
             all_samples += 1
             index += 1
         print "Error rate for " + str(c) + " is: " + str(1.0 - float(positive_count) / all_samples)
+        print "Samples result vector: " + str(correct_samples_v / all_samples_v)
 
 
 if __name__ == "__main__":
@@ -68,6 +96,5 @@ if __name__ == "__main__":
     _run_classification()
     # reader = DatasetReader("Datasets")
     # data = reader.read_training_csv_set()
-    # data[0].show(new_size=(300, 300))
-    # data[1].show(new_size=(300, 300))
-    # data[2].show(new_size=(300, 300))
+    # for i in range(18, 20):
+    #    data[i].show(new_size=(300, 300))
