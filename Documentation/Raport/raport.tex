@@ -2,6 +2,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{polski}
 \usepackage{graphicx}
+\usepackage{hyperref}
 
 
 \begin{document}
@@ -43,6 +44,36 @@ Celem badań było porównanie jakości klasyfikacji dla różnych modeli klasyf
 
 Zbiory danych treningowych oraz testowych pochodzą z publicznej bazy danych MNIST\cite{mnist_database}. Każdy element ze zbioru treningowego jest opisany 785 wartościami. Pierwsza liczba określa zakodowaną cyfrę (wartość z przedziału [0, 9]), kolejne 784 wartości są z przedziału [0, 255] i opisują kolory pikseli zeskanowanej cyfry w skali szarości dla obrazka o wymiarach 28x28 pikseli. Zbiór testowy w przeciwieństwie do treningowego nie zawiera informacji o reprezentowanej klasie. Zbiór treningowy i testowy zawierają odpowiednio 42,000 i 28,000 elementów. \\
 
+\section{Operacje graficzne}
+
+Jednym z założeń dotyczącym zbioru danych było podjęcie próby zmiany wektora cech poprzez dodanie do niego nowych wartości. Zaproponowane zostały cztery nowe cechy którymi były: liczba punktów startowych cyfry, liczba punktów przecięcia cyfry, wektor przecięć cyfry (opisany dokładniej w podrozdziale \ref{DigitIntersectionVector}) a także informacja o liczbie czarnych pikseli. Wszystkie wymienione wyżej cechy zostały wyliczone na podstawie szkieletu litery znajdującej się na obrazku, będącego wynikiem operacji zwanej szkieletyzacją. 
+
+\subsection{Dylatacja}
+Dylatacja to operacja morfologiczna która służy do zamykania małych otworów oraz zatok we wnętrzu symbolu. Obiekty zwiększają swoją objętość i jeśli dwa lub więcej obiektów położonych jest blisko siebie, zrastają się w jedną, większą całość.
+
+\subsection{Erozja}
+Erozja jest operacją odwrotną do dylatacji. Jej działanie polega na obcinaniu brzegów obiektu na obrazie.
+
+\subsection{Szkieletyzacja}
+Szkieletyzacja, zwana również operacją ścieniania, służy do odchudzania graficznego symbolu tak aby jako wynik otrzymać ten sam symbol narysowany linią o grubości jednego piksela. Obecnie istnieje wiele różnych algorytmów szkieletyzacji różniących się podejściem do zagadnienia, stosowalnością (bywają symbole lepiej ścieniane przez jeden algorytm podczas gdy inne mogą być przez niego odchudzane niepoprawnie) jak i złożonością. Do najbardziej znanych zaliczyć można algorytm \href{http://matwbn.icm.edu.pl/ksiazki/amc/amc20/amc2029.pdf}{K3M}, algorytm \href{https://rosettacode.org/wiki/Zhang-Suen_thinning_algorithm}{Zhang-Suen'a}, algorytm Guo-Hall’a a także algorytm KMM.
+
+\subsection{Znajdowanie punktów startowych cyfry \protect\footnote{Na podstawie artykułu: \href{https://arxiv.org/pdf/1202.3884.pdf}{https://arxiv.org/pdf/1202.3884.pdf} } }
+Zazwyczaj pisząc symbole rozpoczynamy i kończymy tę czynność w pewnych szczególnych miejscach. Są to najczęściej niepołączone zakończenia linii które zmuszają do oderwania pióra. Punkty te nazywane są punktami startowymi (chociaż równie dobrze mogłyby nazywać się punktami końcowymi) a ich liczba pomaga w identyfikacji narysowanego symbolu.
+
+\subsection{Znajdowanie przecięć w cyfrze \protect\footnote{Na podstawie artykułu: \href{https://arxiv.org/pdf/1202.3884.pdf}{https://arxiv.org/pdf/1202.3884.pdf} } }
+Punktami przecięcia w narysowanym symbolu nazywane są te miejsca w których następuje rozwidlenie ścieżek. Przykładem może być daszek litery T która swój punkt przecięcia posiada w miejscu złączenia daszka i nogi litery. Stosując algorytm opisany w artykule zaimplementowana została funkcjonalność liczenia punktów przecięć w cyfrach.
+
+\subsection{Wektor przecięć cyfry}
+\label{DigitIntersectionVector}
+Wektor przecięć cyfry zawiera sześć elementów. Przechowuje on wartości informujące o liczbie przecięć narysowanej cyfry z liniami prostymi przechodzącymi przez obraz w określonych miejscach, to znaczy w 30\% 50\% i 70\% jego szerokości i wysokości.
+
+\section{Opis wykorzystanych klasyfikatorów}
+
+\subsection{Backpropagation}
+\subsection{SoftMax}
+\subsection{SVM}
+\subsection{Lasy losowe}
+\subsection{kNN}
 
 \section{Opis wyników}
 
@@ -56,8 +87,8 @@ Zbiory danych treningowych oraz testowych pochodzą z publicznej bazy danych MNI
 	\bibitem{Altman1992} Altman N. S., \emph{An introduction to kernel and nearest-neighbor nonparametric regression}. The American Statistician 46 (3), 1992.
     \bibitem{ScholkopfWilliamsonSmola1992} Scholkopf, B., Williamson, R., Smola, A., Shawe-Taylort, J., Platt, J., \emph{Support Vector Method for Novelty Detection}, Advances in Neural Information Processing Systems 12, 1992. 
     \bibitem{WangCasasent2009} Wang, Y., Casasent, D., \emph{A Support Vector Hierarchical Method for multi-class classification and rejection}, Proc. of Int. Joint Conf. on Neural Networks, 2009.
-    \bibitem{gridsearch} http://scikit-learn.org/stable/modules/grid\_search.html.
-    \bibitem{pybrain} http://pybrain.org/docs/tutorial/fnn.html
+    \bibitem{digit-starting-intersection-points} Dinesh Dileep \emph{A feature extraction technique based on character geometry for character recognition}, \href{https://arxiv.org/pdf/1202.3884.pdf}{https://arxiv.org/pdf/1202.3884.pdf}
+    \bibitem{gridsearch} \href{http://scikit-learn.org/stable/modules/grid\_search.html}{http://scikit-learn.org/stable/modules/grid\_search.html}
 
 
 \end{thebibliography}
