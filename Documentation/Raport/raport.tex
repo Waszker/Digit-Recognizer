@@ -45,7 +45,7 @@ Celem badań było porównanie jakości klasyfikacji dla różnych modeli klasyf
 Zbiory danych treningowych oraz testowych pochodzą z publicznej bazy danych MNIST\cite{mnist_database}. Każdy element ze zbioru treningowego jest opisany 785 wartościami. Pierwsza liczba określa zakodowaną cyfrę (wartość z przedziału [0, 9]), kolejne 784 wartości są z przedziału [0, 255] i opisują kolory pikseli zeskanowanej cyfry w skali szarości dla obrazka o wymiarach 28x28 pikseli. Zbiór testowy w przeciwieństwie do treningowego nie zawiera informacji o reprezentowanej klasie. Zbiór treningowy i testowy zawierają odpowiednio 42,000 i 28,000 elementów. \\
 
 \section{Operacje graficzne}
-
+\label{features_vector}
 Jednym z założeń dotyczącym zbioru danych było podjęcie próby zmiany wektora cech poprzez dodanie do niego nowych wartości. Zaproponowane zostały cztery nowe cechy którymi były: liczba punktów startowych cyfry, liczba punktów przecięcia cyfry, wektor przecięć cyfry (opisany dokładniej w podrozdziale \ref{DigitIntersectionVector}) a także informacja o liczbie czarnych pikseli. Wszystkie wymienione wyżej cechy zostały wyliczone na podstawie szkieletu litery znajdującej się na obrazku, będącego wynikiem operacji zwanej szkieletyzacją. 
 
 \subsection{Dylatacja}
@@ -76,7 +76,55 @@ Wektor przecięć cyfry zawiera sześć elementów. Przechowuje on wartości inf
 \subsection{kNN}
 
 \section{Opis wyników}
+Wyniki zaprezentowane w tym rozdziale zostały uzyskane dla dwóch sposobów otrzymywania wektorów cech. Pierwszy z nich zakładał wykorzystanie obrazów dostępnych w ramach zbiorów testowych i traktowanie ich jako jedynego wejścia dla klasyfikatorów. Drugi sposób rozszerzał wektor o zbiór wyekstrahowanych cech, które zostały opisane w rozdziale \ref{features_vector}. Dla obu podejść dokonano pełnych testów dla każdego z przygotowanych klasyfikatorów. Poniżej zamieszczone zostały tabelki zawierające wyniki. Każda kolumna oznaczona cyfrą oznacza wyniki dla obiektów z danych testowych reprezentujących tę cyfrę. Wartości w komórkach oznaczają jakość klasyfikacji dla poszczególnych klasyfikatorów (ich skuteczność). Wartości w kolumnie oznaczonej jako \textit{error} przestawiają ogólny procent błędu dla każdego z klasyfikatorów. Wiersz \textit{summary} zawiera wartości oznaczające skuteczność rozpoznawania każdej z cyfr przez klasyfikatory łącznie.
 
+\begin{table}[htp]
+	\centering
+	\caption{Wyniki dla danych z podstawowym wektorem cech}
+	\label{basic-vector-results}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|}
+	\cline{2-12}
+	& \textbf{0} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{error} \\ \hline
+	\multicolumn{1}{|l|}{\textbf{SoftMax}}         & 0.86       & 0.83       & 0.84       & 0.83       & 0.81       & 0.80       & 0.85       & 0.84       & 0.80       & 0.81       & 0.17                \\ \hline
+	\multicolumn{1}{|l|}{\textbf{Backpropagation}} & 0.83       & 0.85       & 0.80       & 0.82       & 0.80       & 0.79       & 0.83       & 0.82       & 0.79       & 0.79       & 0.19                \\ \hline
+	\multicolumn{1}{|l|}{\textbf{SVM}}             & 0.20       & 0.92       & 0.00       & 0.52       & 0.45       & 0.00       & 0.68       & 0.12       & 0.00       & 0.81       & 0.80                \\ \hline
+	\multicolumn{1}{|l|}{\textbf{RF}}              & 0.89       & 0.91       & 0.86       & 0.88       & 0.88       & 0.88       & 0.90       & 0.89       & 0.87       & 0.87       & 0.12                \\ \hline
+	\multicolumn{1}{|l|}{\textbf{kNN}}             & 0.88       & 0.86       & 0.89       & 0.88       & 0.89       & 0.86       & 0.89       & 0.87       & 0.90       & 0.87       & 0.12                \\ \hline
+	\multicolumn{1}{|l|}{\textbf{summary}}         & 0.73       & 0.87       & 0.68       & 0.79       & 0.77       & 0.67       & 0.83       & 0.71       & 0.67       & 0.83       &                     \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[htp]
+	\centering
+	\caption{Wyniki dla danych z rozszerzonym wektorem cech}
+	\label{extended-vector-results}
+\begin{tabular}{l|l|l|l|l|l|l|l|l|l|l|l|}
+	\cline{2-12}
+	& \textbf{0} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5} & \textbf{6} & \textbf{7} & \textbf{8} & \textbf{9} & \textbf{error} \\ \hline
+	\multicolumn{1}{|l|}{\textbf{SoftMax}}         & 0.65          & 0.61          & 0.62          & 0.62          & 0.62          & 0.60          & 0.63          & 0.63          & 0.61          & 0.59          & 0.38                \\ \hline
+	\multicolumn{1}{|l|}{\textbf{Backpropagation}} & 0.49          & 0.48          & 0.45          & 0.47          & 0.47          & 0.43          & 0.49          & 0.46          & 0.44          & 0.45          & 0.54                \\ \hline
+	\multicolumn{1}{|l|}{\textbf{SVM}}             & 0.00          & 0.70          & 0.00          & 0.19          & 0.14          & 0.17          & 0.35          & 0.11          & 0.00          & 0.56          & 0.78                \\ \hline
+	\multicolumn{1}{|l|}{\textbf{RF}}              & 0.67          & 0.67          & 0.64          & 0.65          & 0.66          & 0.65          & 0.67          & 0.66          & 0.64          & 0.63          & 0.35                \\ \hline
+	\multicolumn{1}{|l|}{\textbf{kNN}}             & 0.58          & 0.58          & 0.60          & 0.62          & 0.63          & 0.63          & 0.64          & 0.63          & 0.65          & 0.61          & 0.38                \\ \hline
+	\multicolumn{1}{|l|}{\textbf{summary}}         & 0.48          & 0.61          & 0.46          & 0.51          & 0.50          & 0.49          & 0.56          & 0.50          & 0.47          & 0.57          &                     \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=1\textwidth]{Figures/basic-vector-summary.png}
+	\caption{ Wyniki dla danych z podstawowym wektorem cech przedstawione na wykresie }
+	\label{fig:basic-vector-summary}\vspace{-3pt}
+\end{figure}
+
+\begin{figure}[htp]
+\centering
+\includegraphics[width=1\textwidth]{Figures/extended-vector-summary.png}
+\caption{ Wyniki dla danych z rozszerzonym wektorem cech przedstawione na wykresie }
+\label{fig:extended-vector-summary}\vspace{-3pt}
+\end{figure}
+
+\section{Podsumowanie}
 
 
 \newpage
