@@ -70,10 +70,52 @@ Wektor przecięć cyfry zawiera sześć elementów. Przechowuje on wartości inf
 \section{Opis wykorzystanych klasyfikatorów}
 
 \subsection{Backpropagation}
+Algorytm wstecznej propagacji błędu jest algorytmem uczenia dla wielowarstwowych sieci neuronowych. Architektura sieci jest zadana z góry, przed przystąpieniem procesu uczenia ustalona jest liczba warstw ukrytych, neuronów w każdej warstwie, neuronów wejściowych i wyjściowych. Główną zaletą algorytmu jest brak konieczności ustalania wag połączeń między neuronami, które są dobierane za pomocą metody obliczeniowej zwanej wsteczną propagacją błędu. Jest to metoda umożliwiająca modyfikację wag w sieci o architekturze warstwowej, we wszystkich jej warstwach.\\\\
+Ogólny schemat procesu trenowania sieci wygląda następująco:
+\begin{enumerate}
+\item Ustalenie topologii sieci
+\item Zainicjowanie wag w sposób losowy
+\item Obliczenie odpowiedzi sieci dla danego wektora uczącego (warstwa po warstwie)
+\item Każdy neuron wyjściowy oblicza swój błąd, oparty na różnicy pomiędzy obliczoną odpowiedzią oraz poprawną odpowiedzią
+\item Błędy propagowane są do wcześniejszych warstw
+\item Każdy neuron (również w warstwach ukrytych) modyfikuje wagi na podstawie wartości błędu i wielkości przetwarzanych w tym kroku sygnałów
+\item Następuje powtórzenie kroków począwszy od punktu 3. dla kolejnych wektorów uczących. Gdy wszystkie wektory zostaną użyte, losowo zmienia się ich kolejność i wykorzystuje się je powtórnie
+\item Algorytm zatrzymuje się, gdy średni błąd na danych treningowych osiągnie zadaną wartość (zmaleje wystarczająco)
+\end{enumerate}
+
 \subsection{SoftMax}
+Softmax jest uogólnieniem regresji logistycznej do przypadku, gdy rozważa się wiele klas. W regresji logistycznej zakłada się, że etykiety są binarne : $y(i) \in \{0,1\}$. Metoda Softmax pozwala obsługiwać $y(i) \in \{1, ..., K\}$ gdzie K jest liczbą klas.
 \subsection{SVM}
+Metoda maszyny wektorów podpierających (Support Vector Machines) jest jedną z metod uczenia nadzorowanego. Klasyfikator ten znajduje hiperpłaszczyznę rozdzielającą dane treningowe na dwie klasy w ten sposób, że maksymalizuje wartość marginesu geometrycznego dla wszystkich punktów treningowych. Marginesem geometrycznym hiperpłaszczyzny H jest jej odległość do najbliższych punktów. Punkty położone najbliżej hiperpłaszczyzny nazywane są wektorami wspierającymi (ang. support vectors).
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=1\textwidth]{Figures/svm.jpg}
+	\caption{Schemat działania maszyny wektorów podpierających }
+\end{figure}
 \subsection{Lasy losowe}
+Metoda lasów losowych opiera się na drzewach decyzyjnych, zwanych również drzewami klasyfikacyjnymi. Opierają się one o drzewiastą strukturę, w której węzły wewnętrzne zawierają testy na wartościach atrybutów. Z każdego węzła wewnętrznego wychodzi tyle gałęzi, ile jest możliwych wyników testu w tym węźle.  Klasyfikacja zaczyna się w korzeniu drzewa, a kończy po osiągnięciu jednej z klas terminalnych, czyli liścia.\\ 
+Lasy losowe (ang. random forests) będące  uogólnieniem idei drzew decyzyjnych zalicza się do procedur agregujących (ang. ensemble method), w których rolę modelu klasyfikacyjnego pełni grupa modeli składowych. Działanie lasów losowych polega na klasyfikacji za pomocą grupy drzew decyzyjnych. Końcowa decyzja jest podejmowana w wyniku  głosowania większościowego  nad klasami wskazanymi przez poszczególne drzewa decyzyjne.
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=1\textwidth]{Figures/rf.jpg}
+	\caption{Schemat działania lasów losowych }
+\end{figure}
+
 \subsection{kNN}
+Algorytm k najbliższych sąsiadów (ang. k Nearest Neighbours) należy do grupy algorytmów opartych o analizę przypadku. Algorytmy te prezentują swoją wiedzę o świecie w postaci zbioru przypadków lub doświadczeń. Idea klasyfikacji polega na metodach wyszukiwania tych zgromadzonych przypadków, które mogą być zastosowane do klasyfikacji nowych sytuacji. Klasyfikacja nowych przypadków zgodnie z algorytmem kNN jest realizowana na bieżąco, tzn. wtedy gdy pojawia się potrzeba klasyfikacji nowego przypadku, metoda ta nie buduje klasyfikatora. \\
+Obiekty są analizowane w ten sposób , że oblicza się odległości bądź podobieństwa między nimi. Istnieją różne miary podobieństwa czy odległości. Powinny być one wybierane konkretnie dla typu danych analizowanych, ponieważ inne są miary typowo dla danych binarnych, inne dla danych nominalnych a inne dla danych numerycznych.\\
+Dany jest zbiór uczący zawierający obserwacje z których każda ma przypisany wektor zmiennych objaśniających oraz wartość zmiennej objaśnianej Y oraz dana jest obserwacja C z przypisanym wektorem zmiennych objaśniających dla której chcemy prognozować wartość zmiennej objaśnianej Y.\\
+Dla tak zdefiniowanego zadania przebieg algorytmu wygląda następująco:
+\begin{enumerate}
+\item Porównanie wartości zmiennych objaśniających dla obserwacji C z wartościami tych zmiennych dla każdej obserwacji w zbiorze uczącym
+\item Wybór k (ustalona z góry liczba) najbliższych do C obserwacji ze zbioru uczącego
+\item Uśrednienie wartości zmiennej objaśnianej dla wybranych obserwacji, w wyniku czego uzyskiwana jest prognoza
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=1\textwidth]{Figures/knn.png}
+	\caption{Schemat działania metody k najbliższych sąsiadów }
+\end{figure}
+\end{enumerate}
 
 \section{Opis wyników}
 Wyniki zaprezentowane w tym rozdziale zostały uzyskane dla dwóch sposobów otrzymywania wektorów cech. Pierwszy z nich zakładał wykorzystanie obrazów dostępnych w ramach zbiorów testowych i traktowanie ich jako jedynego wejścia dla klasyfikatorów. Drugi sposób rozszerzał wektor o zbiór wyekstrahowanych cech, które zostały opisane w rozdziale \ref{features_vector}. Dla obu podejść dokonano pełnych testów dla każdego z przygotowanych klasyfikatorów. Poniżej zamieszczone zostały tabelki zawierające wyniki. Każda kolumna oznaczona cyfrą oznacza wyniki dla obiektów z danych testowych reprezentujących tę cyfrę. Wartości w komórkach oznaczają jakość klasyfikacji dla poszczególnych klasyfikatorów (ich skuteczność). Wartości w kolumnie oznaczonej jako \textit{error} przestawiają ogólny procent błędu dla każdego z klasyfikatorów. Wiersz \textit{summary} zawiera wartości oznaczające skuteczność rozpoznawania każdej z cyfr przez klasyfikatory łącznie.
