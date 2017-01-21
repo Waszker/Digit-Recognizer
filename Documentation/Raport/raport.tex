@@ -124,15 +124,16 @@ gdzie y to wyjście (odpowiedź udzielona przez sieć), W to wagi połączeń mi
 \end{figure}
 
 \subsection{SVM}
-Metoda maszyny wektorów podpierających (Support Vector Machines) jest jedną z metod uczenia nadzorowanego. Klasyfikator ten znajduje hiperpłaszczyznę rozdzielającą dane treningowe na dwie klasy w ten sposób, że maksymalizuje wartość marginesu geometrycznego dla wszystkich punktów treningowych. Marginesem geometrycznym hiperpłaszczyzny H jest jej odległość do najbliższych punktów. Punkty położone najbliżej hiperpłaszczyzny nazywane są wektorami wspierającymi (ang. support vectors).
+Metoda maszyny wektorów podpierających (Support Vector Machines) jest jedną z metod uczenia nadzorowanego. Klasyfikator ten znajduje hiperpłaszczyznę rozdzielającą dane treningowe na dwie klasy w ten sposób, że maksymalizuje wartość marginesu geometrycznego dla wszystkich punktów treningowych. Marginesem geometrycznym hiperpłaszczyzny H jest jej odległość do najbliższych punktów. Punkty położone najbliżej hiperpłaszczyzny nazywane są wektorami wspierającymi (ang. support vectors). Wyniki omówione później w tym dokumencie zostały otrzymane dla maszyny wektorów podpierających korzystającej jądra gaussowskiego, parametru C równego 8 i gammy 0.5.
 \begin{figure}[htp]
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/svm.jpg}
 	\caption{Schemat działania maszyny wektorów podpierających }
 \end{figure}
+
 \subsection{Lasy losowe}
 Metoda lasów losowych opiera się na drzewach decyzyjnych, zwanych również drzewami klasyfikacyjnymi. Opierają się one o drzewiastą strukturę, w której węzły wewnętrzne zawierają testy na wartościach atrybutów. Z każdego węzła wewnętrznego wychodzi tyle gałęzi, ile jest możliwych wyników testu w tym węźle.  Klasyfikacja zaczyna się w korzeniu drzewa, a kończy po osiągnięciu jednej z klas terminalnych, czyli liścia.\\ 
-Lasy losowe (ang. random forests) będące  uogólnieniem idei drzew decyzyjnych zalicza się do procedur agregujących (ang. ensemble method), w których rolę modelu klasyfikacyjnego pełni grupa modeli składowych. Działanie lasów losowych polega na klasyfikacji za pomocą grupy drzew decyzyjnych. Końcowa decyzja jest podejmowana w wyniku  głosowania większościowego  nad klasami wskazanymi przez poszczególne drzewa decyzyjne.
+Lasy losowe (ang. random forests) będące  uogólnieniem idei drzew decyzyjnych zalicza się do procedur agregujących (ang. ensemble method), w których rolę modelu klasyfikacyjnego pełni grupa modeli składowych. Działanie lasów losowych polega na klasyfikacji za pomocą grupy drzew decyzyjnych. Końcowa decyzja jest podejmowana w wyniku  głosowania większościowego  nad klasami wskazanymi przez poszczególne drzewa decyzyjne. Podczas obliczeń użyte w programie lasy losowe składały się ze 100 drzew decyzyjnych.
 \begin{figure}[htp]
 	\centering
 	\includegraphics[width=1\textwidth]{Figures/rf.jpg}
@@ -154,6 +155,7 @@ Dla tak zdefiniowanego zadania przebieg algorytmu wygląda następująco:
 	\caption{Schemat działania metody k najbliższych sąsiadów }
 \end{figure}
 \end{enumerate}
+W omawianym programie metoda kNN brała pod uwagę 5 najbliższych sąsiadów.
 
 \section{Opis wyników}
 Wyniki zaprezentowane w tym rozdziale zostały uzyskane dla dwóch sposobów otrzymywania wektorów cech. Pierwszy z nich zakładał wykorzystanie obrazów dostępnych w ramach zbiorów testowych i traktowanie ich jako jedynego wejścia dla klasyfikatorów. Drugi sposób rozszerzał wektor o zbiór wyekstrahowanych cech, które zostały opisane w rozdziale \ref{features_vector}. Dla obu podejść dokonano pełnych testów dla każdego z przygotowanych klasyfikatorów. Poniżej zamieszczone zostały tabelki zawierające wyniki. Każda kolumna oznaczona cyfrą oznacza wyniki dla obiektów z danych testowych reprezentujących tę cyfrę. Wartości w komórkach oznaczają jakość klasyfikacji dla poszczególnych klasyfikatorów (ich skuteczność). Wartości w kolumnie oznaczonej jako \textit{error} przestawiają ogólny procent błędu dla każdego z klasyfikatorów. Wiersz \textit{summary} zawiera wartości oznaczające skuteczność rozpoznawania każdej z cyfr przez klasyfikatory łącznie.
