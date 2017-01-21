@@ -44,21 +44,47 @@ Celem badań było porównanie jakości klasyfikacji dla różnych modeli klasyf
 
 Zbiory danych treningowych oraz testowych pochodzą z publicznej bazy danych MNIST\cite{mnist_database}. Każdy element ze zbioru treningowego jest opisany 785 wartościami. Pierwsza liczba określa zakodowaną cyfrę (wartość z przedziału [0, 9]), kolejne 784 wartości są z przedziału [0, 255] i opisują kolory pikseli zeskanowanej cyfry w skali szarości dla obrazka o wymiarach 28x28 pikseli. Zbiór testowy w przeciwieństwie do treningowego nie zawiera informacji o reprezentowanej klasie. Zbiór treningowy i testowy zawierają odpowiednio 42,000 i 28,000 elementów. \\
 
+Z powodu braku skojarzonych odpowiedzi dla danych ze zbioru testowego podjęta została decyzja o utworzeniu zbioru walidacyjnego na podstawie danych treningowych. Ostatecznie do szkolenia klasyfikatorów użyto 29,400 elementów a do testowania skuteczności 12,600 (czyli podział zbioru treningowego był w proporcji 7:3).
+
 \section{Operacje graficzne}
 \label{features_vector}
 Jednym z założeń dotyczącym zbioru danych było podjęcie próby zmiany wektora cech poprzez dodanie do niego nowych wartości. Zaproponowane zostały cztery nowe cechy którymi były: liczba punktów startowych cyfry, liczba punktów przecięcia cyfry, wektor przecięć cyfry (opisany dokładniej w podrozdziale \ref{DigitIntersectionVector}) a także informacja o liczbie czarnych pikseli. Wszystkie wymienione wyżej cechy zostały wyliczone na podstawie szkieletu litery znajdującej się na obrazku, będącego wynikiem operacji zwanej szkieletyzacją. 
 
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=1\textwidth]{Figures/graphic_operations.png}
+	\caption{ Wczytana cyfra 7 (po lewej) po dokonaniu operacji dylatacji (po środku) a następnie szkieletyzacji (z prawej) }
+\end{figure}
+
 \subsection{Dylatacja}
-Dylatacja to operacja morfologiczna która służy do zamykania małych otworów oraz zatok we wnętrzu symbolu. Obiekty zwiększają swoją objętość i jeśli dwa lub więcej obiektów położonych jest blisko siebie, zrastają się w jedną, większą całość.
+Dylatacja to operacja morfologiczna która służy do zamykania małych otworów oraz zatok we wnętrzu symbolu. Obiekty zwiększają swoją objętość i jeśli dwa lub więcej obiektów położonych jest blisko siebie, zrastają się w jedną, większą całość. Dla każdego piksela na obrazie binarnym sprawdzana jest liczba sąsiadów o wartości 1. Jeżeli wynik jest różny od zera ten piksel również zostaje "zapalony" (jego wartość ustawiona na 1).
+
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=1\textwidth]{Figures/dylatacja_przyklad.png}
+	\caption{ Przykład działania algorytmu dylatacji }
+\end{figure}
 
 \subsection{Erozja}
-Erozja jest operacją odwrotną do dylatacji. Jej działanie polega na obcinaniu brzegów obiektu na obrazie.
+Erozja jest operacją dualną do dylatacji. Jej działanie polega na obcinaniu brzegów obiektu na obrazie, powoduje zniknięcie wąskich gałęzi i małych obiektów, likwidację szumu, rozszerzenie się „dziur” w niespójnym obszarze. Dla każdego piksela jeżeli choć jeden piksel z jego sąsiedztwa ma wartość równą 0, punkt ten również zostaje "wygaszony" (jego wartość ustawiona zostaje na 0).
+
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=1\textwidth]{Figures/erozja_przyklad.png}
+	\caption{ Przykład działania algorytmu erozji }
+\end{figure}
 
 \subsection{Szkieletyzacja}
 Szkieletyzacja, zwana również operacją ścieniania, służy do odchudzania graficznego symbolu tak aby jako wynik otrzymać ten sam symbol narysowany linią o grubości jednego piksela. Obecnie istnieje wiele różnych algorytmów szkieletyzacji różniących się podejściem do zagadnienia, stosowalnością (bywają symbole lepiej ścieniane przez jeden algorytm podczas gdy inne mogą być przez niego odchudzane niepoprawnie) jak i złożonością. Do najbardziej znanych zaliczyć można algorytm \href{http://matwbn.icm.edu.pl/ksiazki/amc/amc20/amc2029.pdf}{K3M}, algorytm \href{https://rosettacode.org/wiki/Zhang-Suen_thinning_algorithm}{Zhang-Suen'a}, algorytm Guo-Hall’a a także algorytm KMM.
 
 \subsection{Znajdowanie punktów startowych cyfry \protect\footnote{Na podstawie artykułu: \href{https://arxiv.org/pdf/1202.3884.pdf}{https://arxiv.org/pdf/1202.3884.pdf} } }
 Zazwyczaj pisząc symbole rozpoczynamy i kończymy tę czynność w pewnych szczególnych miejscach. Są to najczęściej niepołączone zakończenia linii które zmuszają do oderwania pióra. Punkty te nazywane są punktami startowymi (chociaż równie dobrze mogłyby nazywać się punktami końcowymi) a ich liczba pomaga w identyfikacji narysowanego symbolu.
+
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=0.5\textwidth]{Figures/starting_points.png}
+	\caption{ Wczytana cyfra 7 z zaznaczonymi na czerwono znalezionymi punktami startowymi }
+\end{figure}
 
 \subsection{Znajdowanie przecięć w cyfrze \protect\footnote{Na podstawie artykułu: \href{https://arxiv.org/pdf/1202.3884.pdf}{https://arxiv.org/pdf/1202.3884.pdf} } }
 Punktami przecięcia w narysowanym symbolu nazywane są te miejsca w których następuje rozwidlenie ścieżek. Przykładem może być daszek litery T która swój punkt przecięcia posiada w miejscu złączenia daszka i nogi litery. Stosując algorytm opisany w artykule zaimplementowana została funkcjonalność liczenia punktów przecięć w cyfrach.
@@ -83,8 +109,20 @@ Ogólny schemat procesu trenowania sieci wygląda następująco:
 \item Algorytm zatrzymuje się, gdy średni błąd na danych treningowych osiągnie zadaną wartość (zmaleje wystarczająco)
 \end{enumerate}
 
+Podczas obliczeń utworzona została sieć typu Backpropagation zawierająca trzy warstwy ukryte. Warstwa wejściowa zawierała liczbę neuronów zgodnych z podawanym wejściem, kolejna warstwa liczyła $\frac{wejście}{2}$ neuronów, następna $\frac{wejście}{4}$  a ostatnia 10 neuronów (po jednym dla każdej klasy).
+
 \subsection{SoftMax}
-Softmax jest uogólnieniem regresji logistycznej do przypadku, gdy rozważa się wiele klas. W regresji logistycznej zakłada się, że etykiety są binarne : $y(i) \in \{0,1\}$. Metoda Softmax pozwala obsługiwać $y(i) \in \{1, ..., K\}$ gdzie K jest liczbą klas.
+Softmax jest uogólnieniem regresji logistycznej do przypadku, gdy rozważa się wiele klas. W regresji logistycznej zakłada się, że etykiety są binarne : $y(i) \in \{0,1\}$. Metoda Softmax pozwala obsługiwać $y(i) \in \{1, ..., K\}$ gdzie K jest liczbą klas. W przygotowanym rozwiązaniu metoda SoftMax posłużyła jako funkcja aktywacji neuronów. Ogólny wzór obliczeń realizowanych przez sieć można przedstawić jako
+\[ y = softmax(W*x + b) \]
+gdzie y to wyjście (odpowiedź udzielona przez sieć), W to wagi połączeń między neuronami, x to poszczególne wejścia sieci a b to bias. Wizualizacja sieci została przedstawiona na Rysunku \ref{softmax_visualize}.
+
+\begin{figure}[htp]
+	\centering
+	\includegraphics[width=0.7\textwidth]{Figures/softmax-regression-scalargraph.png}
+	\label{softmax_visualize}
+	\caption{ Wizualizacja uproszczonej sieci typu SoftMax }
+\end{figure}
+
 \subsection{SVM}
 Metoda maszyny wektorów podpierających (Support Vector Machines) jest jedną z metod uczenia nadzorowanego. Klasyfikator ten znajduje hiperpłaszczyznę rozdzielającą dane treningowe na dwie klasy w ten sposób, że maksymalizuje wartość marginesu geometrycznego dla wszystkich punktów treningowych. Marginesem geometrycznym hiperpłaszczyzny H jest jej odległość do najbliższych punktów. Punkty położone najbliżej hiperpłaszczyzny nazywane są wektorami wspierającymi (ang. support vectors).
 \begin{figure}[htp]
@@ -167,7 +205,9 @@ Wyniki zaprezentowane w tym rozdziale zostały uzyskane dla dwóch sposobów otr
 \end{figure}
 
 \section{Podsumowanie}
-Wbrew oczekiwaniom rozszerzenie wektora cech wcale nie poprawiło jakości klasyfikacji. Wręcz przeciwnie, wyniki otrzymane dla dodatkowych danych są o wiele gorsze niż te dla samego obrazu. Podczas inspekcji zauważono, że skany cyfr dostarczane jako dane testowe nie poddają się łatwej obróbce graficznej. Próby ustalenia wspólnej maski dla operacji dylatacji i erozji nie przyniosły oczekiwanych rezultatów. Niezależnie od przyjętych wartości zawsze wykonanie którejś z czynności morfologicznej powodowało utratę danych na pewnych obrazach. To z kolei przyczyniło się do uzyskania miernych wyników.
+Wbrew oczekiwaniom rozszerzenie wektora cech wcale nie poprawiło jakości klasyfikacji. Wręcz przeciwnie, wyniki otrzymane dla dodatkowych danych są o wiele gorsze niż te dla samego obrazu. Podczas inspekcji zauważono, że skany cyfr dostarczane jako dane testowe nie poddają się łatwej obróbce graficznej. Próby ustalenia wspólnej maski dla operacji dylatacji i erozji nie przyniosły oczekiwanych rezultatów. Niezależnie od przyjętych wartości zawsze wykonanie którejś z czynności morfologicznej powodowało utratę danych na pewnych obrazach. To z kolei przyczyniło się do uzyskania miernych wyników. \\
+
+Wydaje się rozsądnym podjęcie próby poszukiwania takich cech które mogłyby być wyliczane na podstawie zeskanowanych dokumentów bez potrzeby ich modyfikacji. Zgodnie z opisami podejść do zagadnienia klasyfikacji ze strony \href{http://yann.lecun.com/exdb/mnist/}{http://yann.lecun.com/exdb/mnist/} większość rozwiązań nie zawierała operacji na obrazach. Więcej uwagi poświęcono samym klasyfikatorom, ich parametrom i ewentualnym modyfikacjom. Biorąc pod uwagę otrzymane wyniki uważamy, że jest to słuszne podejście.
 
 \newpage
 \begin{thebibliography}{9}
